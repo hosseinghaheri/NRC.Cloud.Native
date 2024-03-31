@@ -30,40 +30,56 @@ namespace NRC.Cloud.Native
 
             while (true)
             {
-                var context = listener.GetContext();
-                var request = context.Request;
-
-                var param= new Dictionary<string, string>();
-                request.Url.Query.TrimStart('?').Split('&').ToList().ForEach(x =>
+                try
                 {
-                    var k=x.Split('=');
-                    param[k[0]] = k[1];
-                });
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write($"[{DateTime.Now}]  ");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write($"{request.RemoteEndPoint.Address}({param["n"]}) ");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write($"=> ");
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine($"{param["act"].ToUpper()} Relay {param["r"]}");
-                Console.ForegroundColor = ConsoleColor.White;
+
+                    var context = listener.GetContext();
+                    var request = context.Request;
+
+                    var param = new Dictionary<string, string>();
+                    request.Url.Query.TrimStart('?').Split('&').ToList().ForEach(x =>
+                    {
+                        var k = x.Split('=');
+                        param[k[0]] = k[1];
+                    });
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.Write($"[{DateTime.Now}]  ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write($"{request.RemoteEndPoint.Address}({param["n"]}) ");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write($"=> ");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+
+                    if (param["act"].ToUpper() == "INP")
+                    {
+                        Console.WriteLine($"{param["act"].ToUpper()} SWI= {param["swi"]} HVI= {param["hvi"]}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{param["act"].ToUpper()} Relay {param["r"]}");
+                    }
+                    Console.ForegroundColor = ConsoleColor.White;
 
 
-                if (request.HasEntityBody)
-                {
-                    var encoding = request.ContentEncoding;
-                    var reader = new System.IO.StreamReader(request.InputStream, encoding);
-                    Console.WriteLine(reader.ReadToEnd());
+                    if (request.HasEntityBody)
+                    {
+                        var encoding = request.ContentEncoding;
+                        var reader = new System.IO.StreamReader(request.InputStream, encoding);
+                        Console.WriteLine(reader.ReadToEnd());
+                    }
+
+                    var response = context.Response;
+                    var responseString = "OK";
+                    var buffer = Encoding.UTF8.GetBytes(responseString);
+                    response.ContentLength64 = buffer.Length;
+                    var output = response.OutputStream;
+                    output.Write(buffer, 0, buffer.Length);
+                    output.Close();
                 }
+                catch (Exception)
+                {
 
-                var response = context.Response;
-                var responseString = "OK";
-                var buffer = Encoding.UTF8.GetBytes(responseString);
-                response.ContentLength64 = buffer.Length;
-                var output = response.OutputStream;
-                output.Write(buffer, 0, buffer.Length);
-                output.Close();
+                }
             }
         }
     }
