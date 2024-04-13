@@ -52,7 +52,7 @@ namespace NRC.Cloud.Native
 
                     if (param["act"].ToUpper() == "INP")
                     {
-                        Console.WriteLine($"{param["act"].ToUpper()} SWI= {param["swi"]} HVI= {param["hvi"]}");
+                        Console.WriteLine($"{param["act"].ToUpper()} \r\n\tSWI= {param["swi"]} \r\n\tHVI= {param["hvi"]}  \r\n\tSWIST= {param["swist"]} \r\n\tHVIST= {param["hvist"]}");
                     }
                     else
                     {
